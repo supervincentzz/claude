@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅行西班牙语学习工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+            background: #f5f0eb;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #e05a2b 0%, #f5a623 100%);
+            color: white;
+            padding: 24px 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(224,90,43,0.3);
+        }
+
+        header h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+        header p { font-size: 13px; opacity: 0.9; margin-bottom: 18px; }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 12px 12px 0 0;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .tab-btn:hover { background: rgba(255,255,255,0.35); }
+        .tab-btn.active { background: white; color: #e05a2b; }
+
+        main { max-width: 720px; margin: 0 auto; padding: 24px 16px 60px; }
+
+        section { display: none; }
+        section.active { display: block; }
+
+        /* ── Cards / containers ── */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e05a2b;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── Pronunciation section ── */
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
+        }
+
+        .letter-card {
+            background: #fff8f5;
+            border: 1px solid #fdd5c0;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .letter-card .letter {
+            font-size: 22px;
+            font-weight: 700;
+            color: #e05a2b;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .letter-card .letter-info { flex: 1; min-width: 0; }
+        .letter-card .letter-name { font-size: 12px; color: #666; }
+        .letter-card .letter-sound { font-size: 11px; color: #999; }
+
+        .speak-btn {
+            background: none;
+            border: 1px solid #e05a2b;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .speak-btn:hover { background: #fff0e8; }
+        .speak-btn:active { background: #fdd5c0; }
+
+        .rule-item {
+            background: #fff8f5;
+            border-left: 4px solid #e05a2b;
+            border-radius: 0 10px 10px 0;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .rule-item .rule-letter {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e05a2b;
+            min-width: 36px;
+            font-family: Georgia, serif;
+        }
+
+        .rule-item .rule-desc { flex: 1; }
+        .rule-item .rule-desc strong { color: #333; font-size: 13px; }
+        .rule-item .rule-desc span { font-size: 12px; color: #666; display: block; margin-top: 2px; }
+        .rule-item .rule-example { font-size: 12px; color: #e05a2b; margin-top: 3px; font-style: italic; }
+
+        /* ── Flashcard section ── */
+        .category-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .cat-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 2px solid #e05a2b;
+            background: white;
+            color: #e05a2b;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .cat-pill.active { background: #e05a2b; color: white; }
+        .cat-pill:hover { background: #fff0e8; }
+        .cat-pill.active:hover { background: #c94e22; }
+
+        .progress-wrap {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .progress-text { font-size: 13px; color: #666; white-space: nowrap; }
+
+        .progress-bar-wrap {
+            flex: 1;
+            min-width: 100px;
+            height: 8px;
+            background: #e8e0d8;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #e05a2b, #f5a623);
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .reset-btn {
+            padding: 5px 12px;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            background: white;
+            font-size: 12px;
+            color: #888;
+            cursor: pointer;
+            font-family: inherit;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .reset-btn:hover { border-color: #e05a2b; color: #e05a2b; }
+
+        /* 3D flip card */
+        .flip-scene {
+            perspective: 1200px;
+            width: 100%;
+            max-width: 380px;
+            height: 220px;
+            margin: 0 auto 20px;
+            cursor: pointer;
+        }
+
+        .flip-card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.55s cubic-bezier(0.4,0.2,0.2,1);
+        }
+
+        .flip-card.flipped { transform: rotateY(180deg); }
+
+        .flip-front, .flip-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .flip-front {
+            background: linear-gradient(135deg, #e05a2b 0%, #f5a623 100%);
+            color: white;
+            box-shadow: 0 8px 28px rgba(224,90,43,0.35);
+        }
+
+        .flip-back {
+            background: white;
+            border: 2px solid #e05a2b;
+            transform: rotateY(180deg);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+        }
+
+        .flip-front .word-es {
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            line-height: 1.2;
+        }
+
+        .flip-front .word-phonetic {
+            font-size: 14px;
+            opacity: 0.85;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .flip-front .word-category {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: auto;
+        }
+
+        .flip-front .flip-hint {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 6px;
+        }
+
+        .flip-back .word-zh {
+            font-size: 26px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .flip-back .word-en {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 14px;
+        }
+
+        .flip-back .example-es {
+            font-size: 13px;
+            color: #e05a2b;
+            font-style: italic;
+            margin-bottom: 3px;
+            line-height: 1.4;
+        }
+
+        .flip-back .example-zh {
+            font-size: 12px;
+            color: #999;
+            line-height: 1.4;
+        }
+
+        .card-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .ctrl-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid #e05a2b;
+            background: white;
+            color: #e05a2b;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        .ctrl-btn:hover { background: #e05a2b; color: white; }
+        .ctrl-btn.primary { background: #e05a2b; color: white; }
+        .ctrl-btn.primary:hover { background: #c94e22; }
+
+        .card-counter {
+            font-size: 13px;
+            color: #888;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        /* ── Dialogue section ── */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .scenario-btn {
+            padding: 12px 8px;
+            border-radius: 12px;
+            border: 2px solid #e8ddd5;
+            background: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            font-family: inherit;
+            color: #555;
+            transition: all 0.15s;
+            line-height: 1.4;
+        }
+
+        .scenario-btn:hover { border-color: #e05a2b; color: #e05a2b; }
+        .scenario-btn.active { border-color: #e05a2b; background: #fff0e8; color: #e05a2b; }
+
+        .scenario-context {
+            background: #fff8f5;
+            border-left: 4px solid #f5a623;
+            border-radius: 0 12px 12px 0;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .dialogue-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .dialogue-row {
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+
+        .dialogue-row.traveler {
+            background: #fff8f5;
+            border-left: 4px solid #e05a2b;
+        }
+
+        .dialogue-row.local {
+            background: #f5f8ff;
+            border-left: 4px solid #4a7ae0;
+        }
+
+        .dialogue-speaker {
+            font-size: 11px;
+            font-weight: 700;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .traveler .dialogue-speaker { color: #e05a2b; }
+        .local .dialogue-speaker { color: #4a7ae0; }
+
+        .dialogue-es {
+            font-size: 15px;
+            color: #333;
+            font-weight: 600;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .dialogue-zh {
+            font-size: 13px;
+            color: #888;
+            margin-top: 3px;
+            line-height: 1.5;
+        }
+
+        .key-phrase {
+            background: #fff3cd;
+            border-radius: 4px;
+            padding: 1px 5px;
+            color: #856404;
+            font-weight: 700;
+        }
+
+        /* speak button inline */
+        .speak-inline {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            line-height: 1;
+            opacity: 0.6;
+            transition: opacity 0.15s;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .speak-inline:hover { opacity: 1; }
+
+        /* no-speech fallback */
+        .no-speech .speak-btn,
+        .no-speech .speak-inline { display: none; }
+
+        @media (max-width: 480px) {
+            header h1 { font-size: 22px; }
+            .tab-btn { padding: 8px 12px; font-size: 13px; }
+            .scenario-grid { grid-template-columns: repeat(2, 1fr); }
+            .flip-scene { height: 200px; }
+            .flip-front .word-es { font-size: 26px; }
+            .alphabet-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🌍 旅行西班牙语</h1>
+    <p>专为旅游入门设计 · 中文界面 · 可离线使用</p>
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="showTab('pronunciation')">🔤 发音入门</button>
+        <button class="tab-btn" onclick="showTab('flashcards')">📚 词汇闪卡</button>
+        <button class="tab-btn" onclick="showTab('dialogues')">💬 情景对话</button>
+    </nav>
+</header>
+
+<main>
+
+<!-- ════════════════════════════════════════
+     TAB 1: 发音入门
+════════════════════════════════════════ -->
+<section id="pronunciation-section" class="active">
+
+    <div class="card">
+        <div class="card-title">📖 西班牙语发音小贴士</div>
+        <p style="font-size:13px;color:#666;line-height:1.7;">
+            西班牙语发音非常规律，基本上<strong>看到什么字母就读什么音</strong>，没有像英语那样大量的不规则读法。掌握下面几条规则，你就能读出大多数单词！
+        </p>
+    </div>
+
+    <div class="card">
+        <div class="card-title">⚠️ 关键发音规则</div>
+        <div id="rules-list"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">🔡 字母表</div>
+        <p style="font-size:12px;color:#999;margin-bottom:12px;">点击 🔊 按钮听发音</p>
+        <div class="alphabet-grid" id="alphabet-grid"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">🗣️ 五个元音，永远清晰</div>
+        <p style="font-size:13px;color:#666;line-height:1.8;margin-bottom:12px;">
+            西班牙语的五个元音发音固定，不像英语会变音：
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center;">
+            <div style="background:#fff8f5;border-radius:10px;padding:12px 4px;">
+                <div style="font-size:22px;font-weight:700;color:#e05a2b;">A</div>
+                <div style="font-size:12px;color:#666;">啊 [a]</div>
+            </div>
+            <div style="background:#fff8f5;border-radius:10px;padding:12px 4px;">
+                <div style="font-size:22px;font-weight:700;color:#e05a2b;">E</div>
+                <div style="font-size:12px;color:#666;">诶 [e]</div>
+            </div>
+            <div style="background:#fff8f5;border-radius:10px;padding:12px 4px;">
+                <div style="font-size:22px;font-weight:700;color:#e05a2b;">I</div>
+                <div style="font-size:12px;color:#666;">衣 [i]</div>
+            </div>
+            <div style="background:#fff8f5;border-radius:10px;padding:12px 4px;">
+                <div style="font-size:22px;font-weight:700;color:#e05a2b;">O</div>
+                <div style="font-size:12px;color:#666;">哦 [o]</div>
+            </div>
+            <div style="background:#fff8f5;border-radius:10px;padding:12px 4px;">
+                <div style="font-size:22px;font-weight:700;color:#e05a2b;">U</div>
+                <div style="font-size:12px;color:#666;">乌 [u]</div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<!-- ════════════════════════════════════════
+     TAB 2: 词汇闪卡
+════════════════════════════════════════ -->
+<section id="flashcards-section">
+
+    <div class="card">
+        <div class="category-filters" id="category-filters"></div>
+        <div class="progress-wrap">
+            <span class="progress-text" id="progress-text">已复习 0 / 68 词</span>
+            <div class="progress-bar-wrap">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <button class="reset-btn" onclick="resetProgress()">重置</button>
+        </div>
+
+        <div class="flip-scene" onclick="flipCard()">
+            <div class="flip-card" id="flip-card">
+                <div class="flip-front" id="card-front"></div>
+                <div class="flip-back" id="card-back"></div>
+            </div>
+        </div>
+
+        <div class="card-controls">
+            <button class="ctrl-btn" onclick="prevCard()">◀ 上一张</button>
+            <span class="card-counter" id="card-counter">1 / 68</span>
+            <button class="ctrl-btn primary" onclick="flipCard()">🔄 翻转</button>
+            <button class="ctrl-btn" onclick="nextCard()">下一张 ▶</button>
+        </div>
+    </div>
+
+</section>
+
+<!-- ════════════════════════════════════════
+     TAB 3: 情景对话
+════════════════════════════════════════ -->
+<section id="dialogues-section">
+
+    <div class="card">
+        <div class="card-title">选择场景</div>
+        <div class="scenario-grid" id="scenario-grid"></div>
+    </div>
+
+    <div class="card" id="dialogue-card" style="display:none;">
+        <div class="card-title" id="dialogue-title"></div>
+        <div class="scenario-context" id="scenario-context"></div>
+        <div class="dialogue-list" id="dialogue-list"></div>
+    </div>
+
+</section>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════
+// WEB SPEECH API
+// ═══════════════════════════════════════
+const hasSpeech = 'speechSynthesis' in window;
+if (!hasSpeech) document.body.classList.add('no-speech');
+
+function speak(text, lang) {
+    if (!hasSpeech) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang || 'es-ES';
+    u.rate = 0.85;
+    speechSynthesis.speak(u);
+}
+
+// ═══════════════════════════════════════
+// DATA: ALPHABET
+// ═══════════════════════════════════════
+const alphabet = [
+    { l:'A a', name:'a', sound:'啊，类似"啊"' },
+    { l:'B b', name:'be', sound:'类似中文"b"' },
+    { l:'C c', name:'ce', sound:'e/i前读"s"，否则"k"' },
+    { l:'D d', name:'de', sound:'类似中文"d"' },
+    { l:'E e', name:'e', sound:'诶，类似"诶"' },
+    { l:'F f', name:'efe', sound:'类似中文"f"' },
+    { l:'G g', name:'ge', sound:'e/i前喉音，否则"g"' },
+    { l:'H h', name:'hache', sound:'永远不发音！' },
+    { l:'I i', name:'i', sound:'衣，类似"衣"' },
+    { l:'J j', name:'jota', sound:'喉音，类似汉语"H"' },
+    { l:'K k', name:'ka', sound:'类似中文"k"' },
+    { l:'L l', name:'ele', sound:'类似中文"l"' },
+    { l:'LL ll', name:'elle', sound:'类似"Y"音' },
+    { l:'M m', name:'eme', sound:'类似中文"m"' },
+    { l:'N n', name:'ene', sound:'类似中文"n"' },
+    { l:'Ñ ñ', name:'eñe', sound:'"ny"，类似"年"的n' },
+    { l:'O o', name:'o', sound:'哦，类似"哦"' },
+    { l:'P p', name:'pe', sound:'类似中文"p"' },
+    { l:'Q q', name:'cu', sound:'永远读"k"（+ue/ui）' },
+    { l:'R r', name:'ere', sound:'单r轻弹，词首/rr颤音' },
+    { l:'RR rr', name:'erre', sound:'颤音，舌尖颤动' },
+    { l:'S s', name:'ese', sound:'类似中文"s"' },
+    { l:'T t', name:'te', sound:'类似中文"t"' },
+    { l:'U u', name:'u', sound:'乌，类似"乌"' },
+    { l:'V v', name:'uve', sound:'和B发音完全相同' },
+    { l:'W w', name:'doble uve', sound:'外来词用，读"w"' },
+    { l:'X x', name:'equis', sound:'多数读"ks"，部分读"h"' },
+    { l:'Y y', name:'ye', sound:'读"y"，单独用时=英语"and"' },
+    { l:'Z z', name:'zeta', sound:'西班牙读"s"（拉美同）' },
+];
+
+const rules = [
+    { letter:'H', strong:'永远不发音', desc:'字母H在西班牙语中完全沉默', example:'hola [o-la] 你好 / hotel [o-tel] 酒店', speak:'hola, hotel, hambre' },
+    { letter:'J', strong:'喉音，类似汉语"H"', desc:'不是英语的J，而是像清清嗓子的摩擦音', example:'jamón [ha-mon] 火腿 / jugo [hu-go] 果汁', speak:'jamón, jugo, trabajo' },
+    { letter:'LL', strong:'读"Y"音', desc:'两个L在一起，读类似英语的Y', example:'llamar [ya-mar] 打电话 / llave [ya-ve] 钥匙', speak:'llamar, llave, llegar' },
+    { letter:'Ñ', strong:'读"ny"，类似"年"的n', desc:'带波浪号的N，是独立字母', example:'mañana [ma-nya-na] 明天 / año [a-nyo] 年', speak:'mañana, año, España' },
+    { letter:'RR', strong:'颤音', desc:'双R需要舌尖颤动，和单R不同（单R是轻弹音）', example:'perro [pe-rro] 狗 / arroz [a-rros] 米饭', speak:'perro, arroz, carro' },
+    { letter:'V/B', strong:'发音完全相同', desc:'V和B在西班牙语中读音一样，都是"b"音', example:'vino [bi-no] 葡萄酒 / bien [bien] 好', speak:'vino, bien, beber' },
+    { letter:'C', strong:'在e/i前读"s"，其他读"k"', desc:'c + e/i → s 音；c + a/o/u → k 音', example:'cerveza [ser-ve-sa] 啤酒 / carta [kar-ta] 菜单', speak:'cerveza, carta, cinco' },
+    { letter:'G', strong:'在e/i前读喉音，其他读"g"', desc:'g + e/i → 喉音（类似j）；g + a/o/u → 普通g', example:'gente [hen-te] 人们 / gracias [gra-syas] 谢谢', speak:'gente, gracias, gusto' },
+    { letter:'¿¡', strong:'倒置标点是西班牙语特色', desc:'问句开头加¿，感叹句开头加¡，不影响发音', example:'¿Cómo estás? 你好吗？/ ¡Hola! 你好！', speak:'¿Cómo estás? ¡Hola!' },
+];
+
+// ═══════════════════════════════════════
+// DATA: VOCABULARY
+// ═══════════════════════════════════════
+const categories = [
+    {
+        id:'greetings', name:'👋 问候礼貌', words:[
+            { es:'Hola', ph:'[oh-la]', zh:'你好', en:'Hello', ex_es:'Hola, ¿cómo estás?', ex_zh:'你好，你怎么样？' },
+            { es:'Buenos días', ph:'[bweh-nos dee-as]', zh:'早上好', en:'Good morning', ex_es:'Buenos días, señor.', ex_zh:'早上好，先生。' },
+            { es:'Buenas tardes', ph:'[bweh-nas tar-des]', zh:'下午好', en:'Good afternoon', ex_es:'Buenas tardes.', ex_zh:'下午好。' },
+            { es:'Buenas noches', ph:'[bweh-nas no-ches]', zh:'晚上好 / 晚安', en:'Good evening / night', ex_es:'Buenas noches.', ex_zh:'晚安。' },
+            { es:'Por favor', ph:'[por fa-vor]', zh:'请', en:'Please', ex_es:'Un café, por favor.', ex_zh:'请来一杯咖啡。' },
+            { es:'Gracias', ph:'[gra-syas]', zh:'谢谢', en:'Thank you', ex_es:'Muchas gracias.', ex_zh:'非常感谢。' },
+            { es:'De nada', ph:'[de na-da]', zh:'不客气', en:"You're welcome", ex_es:'De nada.', ex_zh:'不客气。' },
+            { es:'Perdón / Disculpe', ph:'[per-don / dis-kul-pe]', zh:'对不起 / 打扰一下', en:'Sorry / Excuse me', ex_es:'Perdón, ¿dónde está el baño?', ex_zh:'打扰一下，洗手间在哪？' },
+            { es:'Sí / No', ph:'[see / no]', zh:'是 / 不是', en:'Yes / No', ex_es:'Sí, por favor.', ex_zh:'是的，请。' },
+            { es:'¿Habla inglés?', ph:'[ab-la een-gles]', zh:'您说英语吗？', en:'Do you speak English?', ex_es:'¿Habla inglés, por favor?', ex_zh:'您说英语吗？' },
+        ]
+    },
+    {
+        id:'food', name:'🍽️ 餐厅饮食', words:[
+            { es:'La carta / El menú', ph:'[la kar-ta / el me-nu]', zh:'菜单', en:'The menu', ex_es:'¿Me puede traer la carta?', ex_zh:'能给我菜单吗？' },
+            { es:'Quiero...', ph:'[kye-ro]', zh:'我想要…', en:'I want...', ex_es:'Quiero una mesa para dos.', ex_zh:'我想要一张两人桌。' },
+            { es:'La cuenta', ph:'[la kwen-ta]', zh:'账单', en:'The bill', ex_es:'La cuenta, por favor.', ex_zh:'请结账。' },
+            { es:'Agua', ph:'[a-gwa]', zh:'水', en:'Water', ex_es:'Agua sin gas, por favor.', ex_zh:'请来一杯无气泡水。' },
+            { es:'Cerveza', ph:'[ser-ve-sa]', zh:'啤酒', en:'Beer', ex_es:'Una cerveza, por favor.', ex_zh:'请来一杯啤酒。' },
+            { es:'Vino', ph:'[vee-no]', zh:'葡萄酒', en:'Wine', ex_es:'Una copa de vino tinto.', ex_zh:'一杯红葡萄酒。' },
+            { es:'Soy alérgico a...', ph:'[soy a-ler-hi-ko a]', zh:'我对…过敏', en:"I'm allergic to...", ex_es:'Soy alérgico a los mariscos.', ex_zh:'我对海鲜过敏。' },
+            { es:'¿Qué recomienda?', ph:'[ke re-ko-myen-da]', zh:'您推荐什么？', en:'What do you recommend?', ex_es:'¿Qué recomienda usted?', ex_zh:'您推荐什么？' },
+            { es:'Para llevar', ph:'[pa-ra yye-var]', zh:'打包带走', en:'To take away', ex_es:'¿Puedo pedir para llevar?', ex_zh:'可以打包吗？' },
+            { es:'Tengo una reserva', ph:'[ten-go u-na re-ser-va]', zh:'我有预订', en:'I have a reservation', ex_es:'Tengo una reserva a nombre de Wang.', ex_zh:'我有一个用王的名字预订的位置。' },
+            { es:'¿Puedo pagar con tarjeta?', ph:'[pwe-do pa-gar kon tar-he-ta]', zh:'可以刷卡吗？', en:'Can I pay by card?', ex_es:'¿Puedo pagar con tarjeta, por favor?', ex_zh:'请问可以刷卡吗？' },
+            { es:'Sin gluten', ph:'[seen gloo-ten]', zh:'无麸质', en:'Gluten-free', ex_es:'¿Tiene algo sin gluten?', ex_zh:'有无麸质的食物吗？' },
+        ]
+    },
+    {
+        id:'transport', name:'🗺️ 问路交通', words:[
+            { es:'¿Dónde está...?', ph:'[don-de es-ta]', zh:'…在哪里？', en:'Where is...?', ex_es:'¿Dónde está el metro?', ex_zh:'地铁在哪里？' },
+            { es:'A la derecha', ph:'[a la de-re-cha]', zh:'向右', en:'To the right', ex_es:'Gire a la derecha.', ex_zh:'向右转。' },
+            { es:'A la izquierda', ph:'[a la is-kyer-da]', zh:'向左', en:'To the left', ex_es:'Gire a la izquierda.', ex_zh:'向左转。' },
+            { es:'Todo recto', ph:'[to-do rek-to]', zh:'直走', en:'Straight ahead', ex_es:'Siga todo recto.', ex_zh:'一直直走。' },
+            { es:'El aeropuerto', ph:'[el a-e-ro-pwer-to]', zh:'机场', en:'Airport', ex_es:'¿Cómo llego al aeropuerto?', ex_zh:'怎么去机场？' },
+            { es:'La estación de tren', ph:'[la es-ta-syon de tren]', zh:'火车站', en:'Train station', ex_es:'La estación de tren está cerca.', ex_zh:'火车站在附近。' },
+            { es:'El taxi', ph:'[el tak-see]', zh:'出租车', en:'Taxi', ex_es:'Necesito un taxi.', ex_zh:'我需要一辆出租车。' },
+            { es:'El autobús', ph:'[el ow-to-bus]', zh:'公共汽车', en:'Bus', ex_es:'¿Dónde está la parada de autobús?', ex_zh:'公共汽车站在哪里？' },
+            { es:'El metro', ph:'[el me-tro]', zh:'地铁', en:'Metro / Subway', ex_es:'Un billete de metro, por favor.', ex_zh:'请给我一张地铁票。' },
+            { es:'Cerca / Lejos', ph:'[ser-ka / le-hos]', zh:'近 / 远', en:'Near / Far', ex_es:'¿Está cerca de aquí?', ex_zh:'离这里近吗？' },
+            { es:'A pie', ph:'[a pye]', zh:'步行', en:'On foot', ex_es:'¿Se puede ir a pie?', ex_zh:'可以步行去吗？' },
+            { es:'¿Cuánto cuesta?', ph:'[kwan-to kwes-ta]', zh:'多少钱？', en:'How much does it cost?', ex_es:'¿Cuánto cuesta el billete?', ex_zh:'票多少钱？' },
+        ]
+    },
+    {
+        id:'shopping', name:'🛍️ 购物', words:[
+            { es:'¿Cuánto cuesta esto?', ph:'[kwan-to kwes-ta es-to]', zh:'这个多少钱？', en:'How much is this?', ex_es:'¿Cuánto cuesta esto, por favor?', ex_zh:'请问这个多少钱？' },
+            { es:'Más barato', ph:'[mas ba-ra-to]', zh:'便宜一点', en:'Cheaper', ex_es:'¿Tiene algo más barato?', ex_zh:'有便宜一点的吗？' },
+            { es:'Me lo llevo', ph:'[me lo yye-vo]', zh:'我买了', en:"I'll take it", ex_es:'Me lo llevo.', ex_zh:'我买了。' },
+            { es:'El probador', ph:'[el pro-ba-dor]', zh:'试衣间', en:'Fitting room', ex_es:'¿Dónde está el probador?', ex_zh:'试衣间在哪里？' },
+            { es:'La talla', ph:'[la ta-ya]', zh:'尺码', en:'Size', ex_es:'¿Tiene esta talla en azul?', ex_zh:'这个尺码有蓝色吗？' },
+            { es:'Efectivo / Tarjeta', ph:'[e-fek-tee-vo / tar-he-ta]', zh:'现金 / 刷卡', en:'Cash / Card', ex_es:'¿Paga en efectivo o con tarjeta?', ex_zh:'付现金还是刷卡？' },
+            { es:'El recibo', ph:'[el re-see-bo]', zh:'收据', en:'Receipt', ex_es:'¿Me puede dar el recibo?', ex_zh:'能给我收据吗？' },
+            { es:'La devolución', ph:'[la de-vo-lu-syon]', zh:'退款', en:'Return / Refund', ex_es:'Quiero hacer una devolución.', ex_zh:'我想退款。' },
+        ]
+    },
+    {
+        id:'hotel', name:'🏨 酒店', words:[
+            { es:'La habitación', ph:'[la a-bi-ta-syon]', zh:'房间', en:'Room', ex_es:'Tengo una habitación reservada.', ex_zh:'我订了一间房。' },
+            { es:'Check-in / Check-out', ph:'[chek-in / chek-owt]', zh:'入住 / 退房', en:'Check-in / Check-out', ex_es:'¿A qué hora es el check-out?', ex_zh:'几点退房？' },
+            { es:'La llave', ph:'[la ya-ve]', zh:'钥匙', en:'Key', ex_es:'He perdido la llave.', ex_zh:'我丢了钥匙。' },
+            { es:'El desayuno', ph:'[el de-sa-yoo-no]', zh:'早餐', en:'Breakfast', ex_es:'¿El desayuno está incluido?', ex_zh:'含早餐吗？' },
+            { es:'El wifi', ph:'[el wee-fee]', zh:'无线网络', en:'WiFi', ex_es:'¿Cuál es la contraseña del wifi?', ex_zh:'WiFi密码是多少？' },
+            { es:'El aire acondicionado', ph:'[el ai-re a-kon-di-syo-na-do]', zh:'空调', en:'Air conditioning', ex_es:'El aire acondicionado no funciona.', ex_zh:'空调坏了。' },
+            { es:'La toalla', ph:'[la to-a-ya]', zh:'毛巾', en:'Towel', ex_es:'Necesito más toallas.', ex_zh:'我需要更多毛巾。' },
+            { es:'La recepción', ph:'[la re-sep-syon]', zh:'前台', en:'Reception', ex_es:'Llame a la recepción.', ex_zh:'请打电话给前台。' },
+        ]
+    },
+    {
+        id:'emergency', name:'🚨 紧急情况', words:[
+            { es:'¡Ayuda!', ph:'[a-yoo-da]', zh:'救命！', en:'Help!', ex_es:'¡Ayuda, por favor!', ex_zh:'救命啊！' },
+            { es:'Llame a la policía', ph:'[ya-me a la po-li-see-a]', zh:'请叫警察', en:'Call the police', ex_es:'¡Llame a la policía!', ex_zh:'请叫警察！' },
+            { es:'Necesito un médico', ph:'[ne-se-see-to un me-di-ko]', zh:'我需要看医生', en:'I need a doctor', ex_es:'Necesito un médico urgente.', ex_zh:'我需要紧急看医生。' },
+            { es:'El hospital', ph:'[el os-pi-tal]', zh:'医院', en:'Hospital', ex_es:'¿Dónde está el hospital?', ex_zh:'医院在哪里？' },
+            { es:'Me han robado', ph:'[me an ro-ba-do]', zh:'我被抢了', en:"I've been robbed", ex_es:'Me han robado la cartera.', ex_zh:'我的钱包被抢了。' },
+            { es:'Tengo seguro de viaje', ph:'[ten-go se-goo-ro de vya-he]', zh:'我有旅行保险', en:'I have travel insurance', ex_es:'Tengo seguro de viaje.', ex_zh:'我有旅行保险。' },
+        ]
+    },
+    {
+        id:'numbers', name:'🔢 数字时间', words:[
+            { es:'uno, dos, tres', ph:'[oo-no, dos, tres]', zh:'一、二、三', en:'1, 2, 3', ex_es:'Dos personas, por favor.', ex_zh:'两位，请。' },
+            { es:'cuatro, cinco', ph:'[kwa-tro, seen-ko]', zh:'四、五', en:'4, 5', ex_es:'Mesa para cuatro.', ex_zh:'四人桌。' },
+            { es:'seis, siete, ocho', ph:'[seis, sye-te, o-cho]', zh:'六、七、八', en:'6, 7, 8', ex_es:'Habitación en el piso ocho.', ex_zh:'八楼的房间。' },
+            { es:'nueve, diez', ph:'[nwe-ve, dyes]', zh:'九、十', en:'9, 10', ex_es:'A las nueve de la mañana.', ex_zh:'早上九点。' },
+            { es:'veinte, cien', ph:'[veyn-te, syen]', zh:'二十、一百', en:'20, 100', ex_es:'Son cien euros.', ex_zh:'一百欧元。' },
+            { es:'¿Qué hora es?', ph:'[ke o-ra es]', zh:'现在几点？', en:'What time is it?', ex_es:'¿Qué hora es, por favor?', ex_zh:'请问现在几点？' },
+            { es:'mañana / hoy', ph:'[ma-nya-na / oy]', zh:'明天 / 今天', en:'Tomorrow / Today', ex_es:'Llego mañana.', ex_zh:'我明天到。' },
+            { es:'¿A qué hora...?', ph:'[a ke o-ra]', zh:'…几点…？', en:'At what time...?', ex_es:'¿A qué hora sale el tren?', ex_zh:'火车几点出发？' },
+            { es:'la mañana / la tarde', ph:'[la ma-nya-na / la tar-de]', zh:'上午 / 下午', en:'morning / afternoon', ex_es:'Por la mañana, por favor.', ex_zh:'请安排在上午。' },
+            { es:'¿Cuántos días?', ph:'[kwan-tos dee-as]', zh:'几天？', en:'How many days?', ex_es:'¿Cuántos días se queda?', ex_zh:'您住几天？' },
+        ]
+    },
+];
+
+// ═══════════════════════════════════════
+// DATA: DIALOGUES
+// ═══════════════════════════════════════
+const dialogues = [
+    {
+        id:'airport', emoji:'✈️', title:'在机场',
+        context:'你刚到达西班牙机场，需要通过海关检查，然后寻找行李提取处。',
+        exchanges:[
+            { who:'海关官员', role:'local', es:'Buenos días. ¿Me puede mostrar su pasaporte?', zh:'早上好，请出示您的护照。', keys:['¿Me puede mostrar su pasaporte?'] },
+            { who:'旅客（你）', role:'traveler', es:'Sí, aquí tiene.', zh:'好的，给您。', keys:[] },
+            { who:'海关官员', role:'local', es:'¿Cuál es el motivo de su visita?', zh:'请问您此行的目的是什么？', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'Soy turista. Vengo de vacaciones.', zh:'我是游客，来度假的。', keys:['Soy turista'] },
+            { who:'海关官员', role:'local', es:'¿Cuántos días va a quedarse?', zh:'您打算待几天？', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'Diez días.', zh:'十天。', keys:[] },
+            { who:'海关官员', role:'local', es:'Bienvenido a España. Que disfrute su estancia.', zh:'欢迎来到西班牙，祝您旅途愉快。', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'Muchas gracias. ¿Dónde está la recogida de equipajes?', zh:'非常感谢。请问行李提取处在哪里？', keys:['¿Dónde está'] },
+            { who:'海关官员', role:'local', es:'Siga las señales, está en la planta baja.', zh:'请跟着指示牌走，在一楼。', keys:[] },
+        ]
+    },
+    {
+        id:'restaurant', emoji:'🍽️', title:'在餐厅',
+        context:'你进入一家餐厅，想要订位、点餐、询问推荐菜品并结账。',
+        exchanges:[
+            { who:'服务员', role:'local', es:'Buenas noches. ¿Tiene reserva?', zh:'晚上好，请问您有预订吗？', keys:['¿Tiene reserva?'] },
+            { who:'旅客（你）', role:'traveler', es:'No, no tengo reserva. ¿Hay mesa para dos?', zh:'没有，请问有两人桌吗？', keys:['¿Hay mesa para dos?'] },
+            { who:'服务员', role:'local', es:'Sí, por aquí, por favor.', zh:'有的，请跟我来。', keys:[] },
+            { who:'服务员', role:'local', es:'Aquí tiene la carta. ¿Qué desea tomar?', zh:'这是菜单，请问您想点什么？', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'¿Qué recomienda usted?', zh:'您推荐什么菜？', keys:['¿Qué recomienda usted?'] },
+            { who:'服务员', role:'local', es:'El cocido madrileño es muy bueno hoy.', zh:'今天的马德里炖肉非常好吃。', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'Perfecto. Quiero eso y agua sin gas, por favor.', zh:'太好了。我要那个，还有一杯无气泡水，谢谢。', keys:['Quiero'] },
+            { who:'旅客（你）', role:'traveler', es:'La cuenta, por favor.', zh:'请结账。', keys:['La cuenta, por favor'] },
+            { who:'服务员', role:'local', es:'Son treinta euros. ¿Paga en efectivo o con tarjeta?', zh:'一共三十欧元，您付现金还是刷卡？', keys:['¿Paga en efectivo o con tarjeta?'] },
+            { who:'旅客（你）', role:'traveler', es:'Con tarjeta, por favor.', zh:'刷卡，谢谢。', keys:[] },
+        ]
+    },
+    {
+        id:'directions', emoji:'🗺️', title:'问路',
+        context:'你在街上迷路了，需要向当地人问路去一个景点。',
+        exchanges:[
+            { who:'旅客（你）', role:'traveler', es:'Perdone, ¿me puede ayudar?', zh:'打扰一下，能帮我一下吗？', keys:['Perdone'] },
+            { who:'路人', role:'local', es:'Claro, ¿qué necesita?', zh:'当然，您需要什么？', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'¿Cómo llego al Museo del Prado?', zh:'请问怎么去普拉多博物馆？', keys:['¿Cómo llego a'] },
+            { who:'路人', role:'local', es:'Es muy sencillo. Siga todo recto y gire a la derecha en el semáforo.', zh:'很简单。直走然后在红绿灯处右转。', keys:['Siga todo recto', 'gire a la derecha'] },
+            { who:'旅客（你）', role:'traveler', es:'¿Está lejos de aquí?', zh:'离这里远吗？', keys:[] },
+            { who:'路人', role:'local', es:'No, está a unos diez minutos a pie.', zh:'不远，步行大约十分钟。', keys:['a pie'] },
+            { who:'旅客（你）', role:'traveler', es:'Muchas gracias.', zh:'非常感谢。', keys:[] },
+            { who:'路人', role:'local', es:'¡De nada! ¡Buen paseo!', zh:'不客气，祝您游览愉快！', keys:[] },
+        ]
+    },
+    {
+        id:'hotel', emoji:'🏨', title:'在酒店',
+        context:'你到达酒店，需要办理入住手续，询问早餐、WiFi和退房时间。',
+        exchanges:[
+            { who:'前台', role:'local', es:'Buenas tardes, bienvenido. ¿En qué le puedo ayudar?', zh:'下午好，欢迎光临，有什么可以帮您？', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'Tengo una reserva a nombre de Wang.', zh:'我有一个订房，是以王的名义预订的。', keys:['Tengo una reserva'] },
+            { who:'前台', role:'local', es:'Un momento... Sí, aquí está. Habitación 205.', zh:'稍等……好的，找到了，205号房间。', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'¿El desayuno está incluido?', zh:'含早餐吗？', keys:['¿El desayuno está incluido?'] },
+            { who:'前台', role:'local', es:'Sí, el desayuno es de siete a diez de la mañana.', zh:'是的，早餐时间是早上七点到十点。', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'¿Cuál es la contraseña del wifi?', zh:'WiFi密码是多少？', keys:['¿Cuál es la contraseña del wifi?'] },
+            { who:'前台', role:'local', es:'Es "hotel2024". Aquí tiene su llave.', zh:'是"hotel2024"。这是您的房卡。', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'¿A qué hora es el check-out?', zh:'几点退房？', keys:['¿A qué hora es el check-out?'] },
+            { who:'前台', role:'local', es:'El check-out es antes de las doce del mediodía.', zh:'退房时间是中午十二点之前。', keys:[] },
+        ]
+    },
+    {
+        id:'shopping', emoji:'🛍️', title:'购物',
+        context:'你在商店购物，想询问价格、试穿衣物并付款。',
+        exchanges:[
+            { who:'旅客（你）', role:'traveler', es:'Hola, ¿cuánto cuesta esta camiseta?', zh:'你好，这件T恤多少钱？', keys:['¿cuánto cuesta'] },
+            { who:'店员', role:'local', es:'Cuesta veinte euros.', zh:'二十欧元。', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'¿Tiene una talla más grande?', zh:'有大一号的吗？', keys:['¿Tiene una talla'] },
+            { who:'店员', role:'local', es:'Sí, aquí tiene.', zh:'有，给您。', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'¿Puedo probármela? ¿Dónde está el probador?', zh:'我可以试穿吗？试衣间在哪里？', keys:['¿Puedo probármela?', '¿Dónde está el probador?'] },
+            { who:'店员', role:'local', es:'Está al fondo a la izquierda.', zh:'在最里面靠左边。', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'Me la llevo. ¿Puedo pagar con tarjeta?', zh:'我买了。可以刷卡吗？', keys:['Me la llevo', '¿Puedo pagar con tarjeta?'] },
+            { who:'店员', role:'local', es:'Por supuesto. ¿Quiere el recibo?', zh:'当然可以，您要收据吗？', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'Sí, por favor.', zh:'要的，谢谢。', keys:[] },
+        ]
+    },
+    {
+        id:'emergency', emoji:'🚨', title:'紧急情况',
+        context:'你的钱包被偷了，需要向警察报案。了解这些短语很重要，希望永远用不上！',
+        exchanges:[
+            { who:'旅客（你）', role:'traveler', es:'¡Disculpe! ¡Me han robado la cartera!', zh:'打扰一下！我的钱包被偷了！', keys:['¡Me han robado'] },
+            { who:'警察', role:'local', es:'Tranquilo. ¿Cuándo ocurrió?', zh:'别紧张。是什么时候发生的？', keys:[] },
+            { who:'旅客（你）', role:'traveler', es:'Hace unos minutos, en el mercado.', zh:'几分钟前，在市场里。', keys:[] },
+            { who:'警察', role:'local', es:'¿Tiene seguro de viaje?', zh:'您有旅行保险吗？', keys:['¿Tiene seguro de viaje?'] },
+            { who:'旅客（你）', role:'traveler', es:'Sí, tengo seguro. ¿Dónde está la comisaría más cercana?', zh:'有，我有保险。请问最近的警察局在哪里？', keys:['¿Dónde está la comisaría'] },
+            { who:'警察', role:'local', es:'Está aquí mismo. Le ayudaremos a hacer la denuncia.', zh:'就在这里，我们会帮您报案的。', keys:['hacer la denuncia'] },
+            { who:'旅客（你）', role:'traveler', es:'Muchas gracias. También necesito llamar a mi embajada.', zh:'非常感谢，我还需要联系我的大使馆。', keys:['llamar a mi embajada'] },
+        ]
+    },
+];
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let currentSection = 'pronunciation';
+let currentCategoryId = 'all';
+let filteredWords = [];
+let currentCardIdx = 0;
+let isFlipped = false;
+let reviewedSet = new Set();
+const STORAGE_KEY = 'spanish_tool_reviewed_v1';
+
+// ═══════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════
+function showTab(name) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(name + '-section').classList.add('active');
+    event.currentTarget.classList.add('active');
+    currentSection = name;
+}
+
+// ═══════════════════════════════════════
+// PRONUNCIATION SECTION
+// ═══════════════════════════════════════
+function buildPronunciation() {
+    // Rules
+    const rulesList = document.getElementById('rules-list');
+    rulesList.innerHTML = rules.map(r => `
+        <div class="rule-item">
+            <div class="rule-letter">${r.letter}</div>
+            <div class="rule-desc">
+                <strong>${r.strong}</strong>
+                <span>${r.desc}</span>
+                <span class="rule-example">例：${r.example}</span>
+            </div>
+            <button class="speak-btn" onclick="speak('${r.speak.replace(/'/g,"\\'")}')" title="朗读示例">🔊</button>
+        </div>
+    `).join('');
+
+    // Alphabet
+    const grid = document.getElementById('alphabet-grid');
+    grid.innerHTML = alphabet.map(a => `
+        <div class="letter-card">
+            <div class="letter">${a.l}</div>
+            <div class="letter-info">
+                <div class="letter-name">${a.name}</div>
+                <div class="letter-sound">${a.sound}</div>
+            </div>
+            <button class="speak-btn" onclick="speak('${a.name}', 'es-ES')" title="朗读">🔊</button>
+        </div>
+    `).join('');
+}
+
+// ═══════════════════════════════════════
+// FLASHCARD SECTION
+// ═══════════════════════════════════════
+function buildCategoryFilters() {
+    const container = document.getElementById('category-filters');
+    const allBtn = `<button class="cat-pill active" onclick="filterCategory('all', this)">全部 (${getAllWords().length})</button>`;
+    const catBtns = categories.map(c =>
+        `<button class="cat-pill" onclick="filterCategory('${c.id}', this)">${c.name} (${c.words.length})</button>`
+    ).join('');
+    container.innerHTML = allBtn + catBtns;
+}
+
+function getAllWords() {
+    return categories.flatMap(c => c.words.map(w => ({ ...w, catName: c.name })));
+}
+
+function filterCategory(catId, btn) {
+    currentCategoryId = catId;
+    currentCardIdx = 0;
+    isFlipped = false;
+    document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filteredWords = catId === 'all'
+        ? getAllWords()
+        : categories.find(c => c.id === catId).words.map(w => ({ ...w, catName: categories.find(c => c.id === catId).name }));
+    renderCard();
+    updateProgress();
+}
+
+function renderCard() {
+    const card = document.getElementById('flip-card');
+    card.classList.remove('flipped');
+    isFlipped = false;
+
+    const w = filteredWords[currentCardIdx];
+    if (!w) return;
+
+    const catLabel = w.catName ? w.catName.replace(/[^一-龥a-zA-ZÀ-ÿ\s]/g, '').trim() : '';
+
+    document.getElementById('card-front').innerHTML = `
+        <div class="word-es">${w.es}</div>
+        <div class="word-phonetic">${w.ph}</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="speak-btn" style="border-color:rgba(255,255,255,0.6);color:white;" onclick="event.stopPropagation();speak('${w.es.replace(/'/g,"\\'")}')" title="朗读">🔊</button>
+        </div>
+        <div class="word-category">${catLabel}</div>
+        <div class="flip-hint">点击翻转查看中文</div>
+    `;
+
+    document.getElementById('card-back').innerHTML = `
+        <div class="word-zh">${w.zh}</div>
+        <div class="word-en">${w.en}</div>
+        <div class="example-es">${w.ex_es}</div>
+        <div class="example-zh">${w.ex_zh}</div>
+        <div style="margin-top:10px;">
+            <button class="speak-btn" onclick="event.stopPropagation();speak('${w.ex_es.replace(/'/g,"\\'")}')" title="朗读例句">🔊 朗读例句</button>
+        </div>
+    `;
+
+    document.getElementById('card-counter').textContent = `${currentCardIdx + 1} / ${filteredWords.length}`;
+}
+
+function flipCard() {
+    const card = document.getElementById('flip-card');
+    isFlipped = !isFlipped;
+    card.classList.toggle('flipped', isFlipped);
+    if (isFlipped && filteredWords[currentCardIdx]) {
+        reviewedSet.add(filteredWords[currentCardIdx].es);
+        saveProgress();
+        updateProgress();
+    }
+}
+
+function nextCard() {
+    currentCardIdx = (currentCardIdx + 1) % filteredWords.length;
+    renderCard();
+}
+
+function prevCard() {
+    currentCardIdx = (currentCardIdx - 1 + filteredWords.length) % filteredWords.length;
+    renderCard();
+}
+
+function updateProgress() {
+    const all = getAllWords();
+    const reviewed = all.filter(w => reviewedSet.has(w.es)).length;
+    const pct = all.length ? Math.round(reviewed / all.length * 100) : 0;
+    document.getElementById('progress-text').textContent = `已复习 ${reviewed} / ${all.length} 词`;
+    document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function saveProgress() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...reviewedSet])); } catch(e) {}
+}
+
+function loadProgress() {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) reviewedSet = new Set(JSON.parse(data));
+    } catch(e) {}
+}
+
+function resetProgress() {
+    if (!confirm('确定要重置所有学习进度吗？')) return;
+    reviewedSet.clear();
+    saveProgress();
+    updateProgress();
+}
+
+// ═══════════════════════════════════════
+// DIALOGUE SECTION
+// ═══════════════════════════════════════
+function buildScenarioGrid() {
+    const grid = document.getElementById('scenario-grid');
+    grid.innerHTML = dialogues.map(d =>
+        `<button class="scenario-btn" id="scbtn-${d.id}" onclick="showDialogue('${d.id}')">${d.emoji}<br>${d.title}</button>`
+    ).join('');
+}
+
+function highlightKeys(text, keys) {
+    if (!keys || keys.length === 0) return text;
+    let result = text;
+    keys.forEach(k => {
+        result = result.replace(k, `<span class="key-phrase">${k}</span>`);
+    });
+    return result;
+}
+
+function showDialogue(id) {
+    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('scbtn-' + id).classList.add('active');
+
+    const d = dialogues.find(x => x.id === id);
+    if (!d) return;
+
+    document.getElementById('dialogue-title').textContent = d.emoji + ' ' + d.title;
+    document.getElementById('scenario-context').textContent = d.context;
+
+    const list = document.getElementById('dialogue-list');
+    list.innerHTML = d.exchanges.map(ex => {
+        const esEscaped = ex.es.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        return `
+        <div class="dialogue-row ${ex.role}">
+            <div class="dialogue-speaker">${ex.who}</div>
+            <div class="dialogue-es">
+                <span>${highlightKeys(ex.es, ex.keys)}</span>
+                <button class="speak-inline" onclick="speak('${esEscaped}')" title="朗读">🔊</button>
+            </div>
+            <div class="dialogue-zh">${ex.zh}</div>
+        </div>
+        `;
+    }).join('');
+
+    document.getElementById('dialogue-card').style.display = 'block';
+    document.getElementById('dialogue-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+    loadProgress();
+    buildPronunciation();
+    buildCategoryFilters();
+    filteredWords = getAllWords();
+    renderCard();
+    updateProgress();
+    buildScenarioGrid();
+}
+
+init();
+</script>
+</body>
+</html>
