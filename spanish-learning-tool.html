@@ -473,6 +473,7 @@
         <button class="tab-btn active" onclick="showTab('pronunciation')">🔤 发音入门</button>
         <button class="tab-btn" onclick="showTab('flashcards')">📚 词汇闪卡</button>
         <button class="tab-btn" onclick="showTab('dialogues')">💬 情景对话</button>
+        <button class="tab-btn" onclick="showTab('songs')">🎵 学唱歌曲</button>
     </nav>
 </header>
 
@@ -580,6 +581,17 @@
         <div class="dialogue-list" id="dialogue-list"></div>
     </div>
 
+</section>
+
+<!-- ════════════════════════════════════════
+     TAB 4: 学唱歌曲
+════════════════════════════════════════ -->
+<section id="songs-section">
+    <div class="card" style="text-align:center;padding-bottom:12px;">
+        <div class="card-title" style="margin-bottom:4px;">🎵 歌曲跟唱</div>
+        <p style="font-size:13px;color:#666;">逐句对照 · 点 🔊 听西班牙语发音 · 跟着唱</p>
+    </div>
+    <div id="song-list"></div>
 </section>
 
 </main>
@@ -2058,6 +2070,81 @@ function showDialogue(id) {
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
+// ═══════════════════════════════════════
+// DATA: SONGS
+// ═══════════════════════════════════════
+const songs = [
+    {
+        title: 'Para amarte',
+        artist: 'Reik',
+        desc: '为了爱你 · Reik · 歌词讲述恋爱教会自己的一切，西班牙语学习热门歌曲',
+        lines: [
+            { type:'verse', es:'Para amarte', ph:'[PA-ra a-MAR-te]', zh:'为了爱你' },
+            { type:'verse', es:'Necesito una razón', ph:'[ne-se-SI-to U-na ra-SON]', zh:'我需要一个理由' },
+            { type:'verse', es:'Y es difícil creer', ph:'[i es di-FI-sil kre-ER]', zh:'但很难相信' },
+            { type:'verse', es:'Que no exista una más que este amor', ph:'[ke no ek-SIS-ta U-na mas ke ES-te a-MOR]', zh:'除了这份爱，再无别的理由' },
+            { type:'verse', es:'Sobra tanto', ph:'[SO-bra TAN-to]', zh:'有太多太多' },
+            { type:'verse', es:'Dentro de este corazón', ph:'[DEN-tro de ES-te ko-ra-SON]', zh:'在这颗心里' },
+            { type:'verse', es:'Y a pesar de que dicen', ph:'[i a pe-SAR de ke DI-sen]', zh:'尽管人们都说' },
+            { type:'verse', es:'Que los años son sabios', ph:'[ke los A-nyos son SA-byos]', zh:'岁月让人睿智' },
+            { type:'verse', es:'Todavía se siente el dolor', ph:'[to-da-VI-a se SYEN-te el do-LOR]', zh:'可痛依然还在' },
+            { type:'chorus', es:'Porque todo el tiempo que pasé junto a ti', ph:'[POR-ke TO-do el TYEM-po ke pa-SE HUN-to a ti]', zh:'因为和你在一起的所有时光' },
+            { type:'chorus', es:'Dejó tejido su hilo dentro de mí', ph:'[de-HO te-HI-do su I-lo DEN-tro de mi]', zh:'把它的线织进了我心里' },
+            { type:'chorus', es:'Y aprendí a quitarle al tiempo los segundos', ph:'[i a-pren-DI a ki-TAR-le al TYEM-po los se-GUN-dos]', zh:'我学会从时间里偷走每一秒' },
+            { type:'chorus', es:'Tú me hiciste ver el cielo aún más profundo', ph:'[tu me i-SIS-te ver el SYE-lo a-UN mas pro-FUN-do]', zh:'你让我看见天空更加深邃' },
+            { type:'chorus', es:'Junto a ti creo que aumenté más de tres kilos', ph:'[HUN-to a ti KRE-o ke au-men-TE mas de tres KI-los]', zh:'和你在一起我大概胖了三公斤' },
+            { type:'chorus', es:'Con tus tantos dulces besos repartidos', ph:'[kon tus TAN-tos DUL-ses BE-sos re-par-TI-dos]', zh:'因为你那么多甜蜜的吻' },
+            { type:'chorus', es:'Desarrollaste mi sentido del olfato', ph:'[de-sa-rro-YAS-te mi sen-TI-do del ol-FA-to]', zh:'你唤醒了我的嗅觉' },
+            { type:'chorus', es:'Y fue por ti que aprendí a querer los gatos', ph:'[i fwe por ti ke a-pren-DI a ke-RER los GA-tos]', zh:'也是因为你我学会了爱猫' },
+            { type:'chorus', es:'Despegaste del cemento mis zapatos', ph:'[des-pe-GAS-te del se-MEN-to mis sa-PA-tos]', zh:'你把我的鞋从水泥地上拔起' },
+            { type:'chorus', es:'Para escapar los dos volando un rato', ph:'[PA-ra es-ka-PAR los dos vo-LAN-do un RA-to]', zh:'让我俩飞起来逃离一会儿' },
+            { type:'chorus', es:'Pero olvidaste una final instrucción', ph:'[PE-ro ol-vi-DAS-te U-na fi-NAL ins-truk-SYON]', zh:'但你忘了留下最后一句叮咛' },
+            { type:'chorus', es:'Porque aún no sé cómo vivir sin tu amor', ph:'[POR-ke a-UN no se KO-mo vi-VIR sin tu a-MOR]', zh:'因为我还不知道没有你的爱该怎么活' },
+            { type:'verse', es:'Y descubrí lo qué significa una rosa', ph:'[i des-ku-BRI lo ke sig-ni-FI-ka U-na RO-sa]', zh:'我懂得了一朵玫瑰的意义' },
+            { type:'verse', es:'Y me enseñaste a decir mentiras piadosas', ph:'[i me en-se-NYAS-te a de-SIR men-TI-ras pya-DO-sas]', zh:'你教我说善意的谎言' },
+            { type:'verse', es:'Para poder verte a horas no adecuadas', ph:'[PA-ra po-DER VER-te a O-ras no a-de-KWA-das]', zh:'为了能在不合时宜的时刻见你' },
+            { type:'verse', es:'Y a reemplazar palabras por miradas', ph:'[i a re-em-pla-SAR pa-LA-bras por mi-RA-das]', zh:'学会用眼神代替言语' },
+            { type:'verse', es:'Y fue por ti que escribí más de 100 canciones', ph:'[i fwe por ti ke es-kri-BI mas de SYEN kan-SYO-nes]', zh:'也是因为你我写了一百多首歌' },
+            { type:'verse', es:'Y hasta perdoné tus equivocaciones', ph:'[i AS-ta per-do-NE tus e-ki-vo-ka-SYO-nes]', zh:'甚至原谅了你的错' },
+            { type:'verse', es:'Y conocí más de mil formas de besar', ph:'[i ko-no-SI mas de mil FOR-mas de be-SAR]', zh:'我懂得了一千多种亲吻的方式' },
+            { type:'verse', es:'Y fue por ti que descubrí lo que es amar', ph:'[i fwe por ti ke des-ku-BRI lo ke es a-MAR]', zh:'也是因为你，我懂得了什么是爱' },
+            { type:'refrain', es:'Lo que es amar', ph:'[lo ke es a-MAR]', zh:'什么是爱' },
+        ]
+    }
+];
+
+// ═══════════════════════════════════════
+// SONGS SECTION
+// ═══════════════════════════════════════
+function buildSongs() {
+    const container = document.getElementById('song-list');
+    container.innerHTML = songs.map(song => `
+        <div class="card" style="padding:0;overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#e05a2b,#f5a623);padding:16px 20px;color:white;">
+                <div style="font-size:18px;font-weight:700;">🎵 ${song.title}</div>
+                <div style="font-size:13px;opacity:0.9;margin-top:2px;">${song.artist}</div>
+                <div style="font-size:12px;opacity:0.75;margin-top:6px;">${song.desc}</div>
+            </div>
+            <div style="padding:8px 0;">
+                ${song.lines.map((line,i) => {
+                    const isBridge = line.type === 'chorus';
+                    const isRefrain = line.type === 'refrain';
+                    const bg = isBridge ? '#fff8f5' : isRefrain ? '#f5f0ff' : 'white';
+                    const border = isBridge ? '#e05a2b' : isRefrain ? '#9b59b6' : '#e0e0e0';
+                    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-left:3px solid ${border};background:${bg};margin:3px 8px;border-radius:6px;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:15px;font-weight:600;color:#222;">${line.es}</div>
+                            <div style="font-size:12px;color:#e05a2b;margin-top:2px;font-style:italic;">${line.ph}</div>
+                            <div style="font-size:13px;color:#555;margin-top:2px;">${line.zh}</div>
+                        </div>
+                        ${hasSpeech ? `<button onclick="speak('${line.es.replace(/'/g,"\\'")}')" style="flex-shrink:0;background:none;border:1.5px solid #e05a2b;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;padding:0;" title="朗读">🔊</button>` : ''}
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
 function init() {
     loadProgress();
     buildPronunciation();
@@ -2066,6 +2153,7 @@ function init() {
     renderCard();
     updateProgress();
     buildScenarioGrid();
+    buildSongs();
 }
 
 init();
